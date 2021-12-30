@@ -32,7 +32,22 @@ func Execute() error {
 	return rootCmd.Execute()
 }
 
-func getCredentials() error {
+func initCredentials() error {
+	if err := initUsername(); err != nil {
+		return err
+	}
+	return initPassword()
+}
+
+func initUsername() error {
+	if len(username) > 0 {
+		return nil
+	}
+	var ok bool
+	username, ok = os.LookupEnv("APPLURA_CLI_USERNAME")
+	if ok {
+		return nil
+	}
 	var err error
 	if len(username) == 0 {
 		fmt.Printf("username: ")
@@ -41,6 +56,15 @@ func getCredentials() error {
 			return err
 		}
 	}
+	return nil
+}
+
+func initPassword() error {
+	var ok bool
+	password, ok = os.LookupEnv("APPLURA_CLI_PASSWORD")
+	if ok {
+		return nil
+	}
 	fmt.Printf("password: ")
 	p, err := terminal.ReadPassword(syscall.Stdin)
 	fmt.Printf("\n")
@@ -48,7 +72,7 @@ func getCredentials() error {
 		return err
 	}
 	if len(p) == 0 {
-		return fmt.Errorf("please enter a password")
+		return fmt.Errorf("please enter a password or set the APPLURA_CLI_PASSWORD environment variable")
 	}
 	password = fmt.Sprintf("%s", p)
 	return nil

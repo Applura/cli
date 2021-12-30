@@ -53,7 +53,7 @@ func deploy(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("%s does not exist or is not readable: %v\n", filepath, err)
 	}
-	if err := getCredentials(); err != nil {
+	if err := initCredentials(); err != nil {
 		log.Fatalf("credentials are required: %v", err)
 	}
 	uploadURL, releaseURL, err := createRelease(domain)
