@@ -1,0 +1,5 @@
+# artifacts
+bin/*
+
+# developer-specific configuration
+.idea
