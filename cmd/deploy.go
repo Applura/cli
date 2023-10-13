@@ -22,7 +22,7 @@ const (
 
 const defaultMediaType = "application/vnd.api+json"
 
-const apiHostname = "api.ops.applura.com"
+const apiHostname = "api.ops.applura.app"
 
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
