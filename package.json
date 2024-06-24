@@ -1,0 +1,21 @@
+{
+  "name": "applura",
+  "version": "1.0.0",
+  "description": "Applura command-line utility",
+  "type": "module",
+  "main": "./bin/cli.js",
+  "author": "Applura, Inc.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "check:prettier": "prettier -c bin src",
+    "prettier": "prettier -w bin src"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "prettier": "^3.3.2"
+  },
+  "dependencies": {
+    "read": "^3.0.1"
+  }
+}
