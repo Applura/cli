@@ -1,9 +1,9 @@
 {
   "name": "applura",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Applura command-line utility",
   "type": "module",
-  "main": "./bin/cli.js",
+  "bin": "bin/cli.js",
   "author": "Applura, Inc.",
   "license": "MIT",
   "scripts": {

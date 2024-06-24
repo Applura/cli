@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { cwd, argv, stdin, stdout, stderr, env, exit } from "node:process";
 import main from "../src/main.js";
 import { UserError } from "../src/lib/errors.js";
