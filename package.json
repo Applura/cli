@@ -1,6 +1,6 @@
 {
   "name": "applura",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Applura command-line utility",
   "type": "module",
   "bin": "bin/cli.js",
