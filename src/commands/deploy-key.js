@@ -24,8 +24,8 @@ async function deployKey(args, { stdin, stdout, stderr }, config) {
     stderr,
     {
       pending: "Verifying key…",
-      success: "Key verified.\n",
-      failed: "Key could not be verified.\n",
+      resolved: "Key verified.\n",
+      rejected: "Key could not be verified.\n",
     },
     DeployKey.getProject(key, { config }),
   );
@@ -42,7 +42,7 @@ async function deployKey(args, { stdin, stdout, stderr }, config) {
   );
 }
 
-async function printWhile(stdStream, { pending, success, failed }, unresolved) {
+async function printWhile(stdStream, { pending, resolved, rejected }, unresolved) {
   let done = false;
   let succeeded = false;
   const results = await Promise.all([
@@ -66,7 +66,7 @@ async function printWhile(stdStream, { pending, success, failed }, unresolved) {
   ]);
   readline.clearLine(stdStream, -1);
   readline.cursorTo(stdStream, 0);
-  stdStream.write(succeeded ? success : failed);
+  stdStream.write(succeeded ? resolved : rejected);
   return results[0];
 }
 
