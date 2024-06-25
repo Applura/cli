@@ -33,6 +33,8 @@ export class MissingDeployKeyDirectoryError extends InvalidConfigurationFileErro
   }
 }
 
+export class DeployKeyNotSetError extends InvariantError {}
+
 export class InvalidSettingError extends UserError {
   pointer;
 

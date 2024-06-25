@@ -3,6 +3,7 @@
   "version": "1.0.3",
   "description": "Applura command-line utility",
   "type": "module",
+  "main": "bin/cli.js",
   "bin": "bin/cli.js",
   "author": "Applura, Inc.",
   "license": "MIT",

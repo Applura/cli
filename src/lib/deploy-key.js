@@ -8,6 +8,7 @@ import {
   UserError,
 } from "./errors.js";
 import { readFileSync, statSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import parse from "./resource.js";
 import { writeFile } from "node:fs/promises";
 import { sep } from "node:path";
@@ -127,8 +128,11 @@ export class DeployKey {
     }
     const keyStats = statSync(this.#path, { throwIfNoEntry: false });
     if (keyStats !== undefined) {
+      if ((await readFile(this.#path)).toString() === this.#read) {
+        return;
+      }
       throw new DeployKeyAlreadyExistsError(
-        `a deploy key at the path ${this.#path} already exists`,
+        `a deploy key at the path ${this.#path} already exists but it does not match the entered key`,
       );
     }
     await writeFile(this.#path, this.#read, {

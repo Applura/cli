@@ -1,13 +1,9 @@
-import { configFileName, Config } from "../lib/config.js";
+import { Config, configFileName } from "../lib/config.js";
 import { mkdirSync } from "node:fs";
 import { read } from "read";
 import { writeFile } from "node:fs/promises";
 import { sep } from "node:path";
-
-function isYes(answer) {
-  const check = answer.toLowerCase();
-  return ["y", "yes"].some((v) => check === v);
-}
+import { isYes } from "../lib/cli.js";
 
 export async function setUpMissingConfigurationDirectory(
   programArgs,
