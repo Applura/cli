@@ -48,6 +48,7 @@ export default async function main(cwd, argv, stdStreams, env) {
       await handle(e, commandName, argv, stdStreams, context);
     } else {
       const config = Config.read(context);
+      console.log(config);
       const run = commands[commandName];
       await run(commandArgs, stdStreams, config);
     }
