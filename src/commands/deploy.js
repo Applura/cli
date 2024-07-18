@@ -4,8 +4,8 @@ import { setupDeployKey } from "./deploy-key.js";
 import { mkdir, readdir, writeFile, stat } from "node:fs/promises";
 import { dirname } from "node:path";
 import { InvalidPathError, KnownError } from "../lib/errors.js";
-import {read} from "read";
-import {apiDeploy} from "../lib/api.js";
+import { read } from "read";
+import { apiDeploy } from "../lib/api.js";
 
 /**
  *
@@ -40,7 +40,7 @@ export default async function deploy(args, { stdin, stdout, stderr }, config) {
           output: stdout,
         })
       ) {
-        await setupDeployKeyIDFile(key.id, {stdin, stdout, stderr}, config);
+        await setupDeployKeyIDFile(key.id, { stdin, stdout, stderr }, config);
       }
     }
   }
@@ -64,19 +64,21 @@ async function setupDeployKeyIDFile(keyID, { stdin, stdout, stderr }, config) {
   const dir = dirname(config.deployKeyIDFilePath);
   await readdir(dir).catch((e) => {
     switch (e.code) {
-      case 'ENOENT':
-      case 'ENOTDIR':
+      case "ENOENT":
+      case "ENOTDIR":
         return mkdir(dir, { mode: 0o755 }).catch((e) => {
           switch (e.code) {
-            case 'EEXIST':
-              throw new InvalidPathError(`${dir} must be a directory but it is not.`);
+            case "EEXIST":
+              throw new InvalidPathError(
+                `${dir} must be a directory but it is not.`,
+              );
             default:
           }
         });
       default:
         throw e;
     }
-  })
+  });
   await writeFile(config.deployKeyIDFilePath, keyID).catch();
 }
 
@@ -111,4 +113,3 @@ async function selectKey(args, { stdin, stdout, stderr }, config) {
   );
   return { key, project };
 }
-

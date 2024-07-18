@@ -83,7 +83,7 @@ export class Context {
   }
 
   get deployKeyID() {
-    return this.#deployKeyID
+    return this.#deployKeyID;
   }
 
   get deployKeyIDFilePath() {

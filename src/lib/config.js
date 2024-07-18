@@ -49,7 +49,13 @@ export class Config {
    * @throws DeployKeyNotSetError
    */
   get deployKey() {
-    return this.#context.deployKey || (this.#context.deployKeyID && this.#settings.deployKeys.find(key => key.id === this.#context.deployKeyID));
+    return (
+      this.#context.deployKey ||
+      (this.#context.deployKeyID &&
+        this.#settings.deployKeys.find(
+          (key) => key.id === this.#context.deployKeyID,
+        ))
+    );
   }
 
   get deployKeys() {

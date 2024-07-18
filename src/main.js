@@ -7,7 +7,7 @@ import {
   NoCommandError,
   UnknownError,
   UserError,
-} from './lib/errors.js';
+} from "./lib/errors.js";
 import {
   setUpMissingConfigurationDirectory,
   setUpMissingConfigurationFile,
@@ -48,7 +48,6 @@ export default async function main(cwd, argv, stdStreams, env) {
       await handle(e, commandName, argv, stdStreams, context);
     } else {
       const config = Config.read(context);
-      console.log(config);
       const run = commands[commandName];
       await run(commandArgs, stdStreams, config);
     }
@@ -68,9 +67,17 @@ async function handle(e, commandName, programArgs, stdStreams, context) {
   }
   const resolveWith = (fn) => () => fn(programArgs, stdStreams, context);
   const routines = new Map([
-    [MissingConfigurationDirectoryError, resolveWith(setUpMissingConfigurationDirectory)],
+    [
+      MissingConfigurationDirectoryError,
+      resolveWith(setUpMissingConfigurationDirectory),
+    ],
     [MissingConfigurationFileError, resolveWith(setUpMissingConfigurationFile)],
-    [InvalidPathError, (e) => { throw e; }],
+    [
+      InvalidPathError,
+      (e) => {
+        throw e;
+      },
+    ],
   ]);
   for (const [errorType, resolve] of routines) {
     if (e instanceof errorType) {

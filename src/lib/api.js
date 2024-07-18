@@ -1,11 +1,11 @@
-import {DeployKey} from "./deploy-key.js";
-import {zip} from "zip-a-folder";
-import fs from "fs";
-import {UnknownError} from "./errors.js";
+import { DeployKey } from "./deploy-key.js";
+import { zip } from "zip-a-folder";
+import { mkdtempSync } from "node:fs";
+import { UnknownError } from "./errors.js";
 import parse from "./resource.js";
 import { tmpdir } from "node:os";
-import {sep} from "node:path";
-import {printWhile} from "./cli.js";
+import { sep } from "node:path";
+import { printWhile } from "./cli.js";
 
 export async function apiDeploy(key, deployFolder, releaseNote, {stdin, stdout, stderr}, config) {
     const project = await DeployKey.getProject(key, { config });
@@ -13,7 +13,7 @@ export async function apiDeploy(key, deployFolder, releaseNote, {stdin, stdout, 
     let releaseOverview = await getLinkData(key, releaseOverviewLink, { config });
     const createFormLink = releaseOverview.links.get('create-form').href;
     const createFrom = await getLinkData(key, createFormLink, { config });
-    const testDir = fs.mkdtempSync(`${tmpdir()}${sep}`);
+    const testDir = mkdtempSync(`${tmpdir()}${sep}`);
     await printWhile(
         stderr,
         {
@@ -75,18 +75,18 @@ export async function apiDeploy(key, deployFolder, releaseNote, {stdin, stdout, 
  * @param href
  */
 async function getLinkData(key, href, { config }) {
-    const response = await fetch(config.serverURL+href, {
-        headers: {
-            authorization: `Bearer ${key.read()}`,
-        },
-    });
-    if (response.status !== 200) {
-        throw new UnknownError(`unexpected status code: ${response.status}`);
-    }
-    const mediaType =
-        response.headers.get("content-type") || "no content-type header";
-    if (!mediaType.startsWith("application/vnd.api+json")) {
-        throw new UnknownError(`unexpected media type: ${mediaType}`);
-    }
-    return parse(await response.json());
+  const response = await fetch(config.serverURL + href, {
+    headers: {
+      authorization: `Bearer ${key.read()}`,
+    },
+  });
+  if (response.status !== 200) {
+    throw new UnknownError(`unexpected status code: ${response.status}`);
+  }
+  const mediaType =
+    response.headers.get("content-type") || "no content-type header";
+  if (!mediaType.startsWith("application/vnd.api+json")) {
+    throw new UnknownError(`unexpected media type: ${mediaType}`);
+  }
+  return parse(await response.json());
 }
