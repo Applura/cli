@@ -55,7 +55,13 @@ export default async function deploy(args, { stdin, stdout, stderr }, config) {
       input: stdin,
       output: stdout,
     });
-    await apiDeploy(key, args[0], releaseNote, {stdin, stdout, stderr}, config);
+    await apiDeploy(
+      key,
+      args[0],
+      releaseNote,
+      { stdin, stdout, stderr },
+      config,
+    );
   }
   stdout.write(`Selected!\n`);
 }
