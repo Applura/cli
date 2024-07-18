@@ -63,7 +63,7 @@ export default async function deploy(args, { stdin, stdout, stderr }, config) {
       config,
     );
   }
-  stdout.write(`Selected!\n`);
+  stderr.write("Deployment complete.\n");
 }
 
 async function setupDeployKeyIDFile(keyID, { stdin, stdout, stderr }, config) {
