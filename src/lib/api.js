@@ -1,6 +1,6 @@
 import { DeployKey } from "./deploy-key.js";
 import { zip } from "zip-a-folder";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, statSync, createReadStream } from "node:fs";
 import { UnknownError } from "./errors.js";
 import parse from "./resource.js";
 import { tmpdir } from "node:os";
@@ -24,9 +24,9 @@ export async function apiDeploy(key, deployFolder, releaseNote, {stdin, stdout, 
         zip(deployFolder, `${testDir}${sep}deploy.zip`),
     );
     const uploadLink = createFrom.links.get('https://docs.applura.com/operations/link-relations/upload-frontend-release').href;
-    const stats = fs.statSync(`${testDir}${sep}deploy.zip`);
+    const stats = statSync(`${testDir}${sep}deploy.zip`);
     const fileSizeInBytes = stats.size;
-    let readStream = fs.createReadStream(`${testDir}${sep}deploy.zip`);
+    let readStream = createReadStream(`${testDir}${sep}deploy.zip`);
     await printWhile(
         stderr,
         {
