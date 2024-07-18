@@ -61,6 +61,12 @@ function Resource(obj, doc) {
       }
     }
   }
+  if ("links" in obj) {
+    Object.defineProperty(this, "links", {
+      value: new Links(obj.links),
+      enumerable: true,
+    });
+  }
   doc.resources.set(`${obj.type}:${obj.id}`, this);
 }
 

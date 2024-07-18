@@ -62,18 +62,8 @@ export class Settings {
     return `https://${this.#server.hostname}`;
   }
 
-  /**
-   * @param {Context} context
-   * @return {string|undefined}
-   */
-  deployKey(context) {
-    const target = context.deployKeyID
-      ? this.#deployKeys.find((key) => key.id === context.deployKeyID)
-      : this.#deployKeys.find((key) => key.project === context.project);
-    if (target instanceof DeployKey) {
-      return target.read();
-    }
-    return undefined;
+  get deployKeys() {
+    return this.#deployKeys || [];
   }
 
   get normalized() {

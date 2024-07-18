@@ -2,6 +2,7 @@ import { argv, argv0 } from "node:process";
 import { readFileSync, statSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import {
+  DeployKeyNotSetError,
   InvalidConfigurationFileError,
   InvalidPathError,
   InvalidSettingError,
@@ -43,8 +44,22 @@ export class Config {
     this.#context = context;
   }
 
+  /**
+   * @return {DeployKey}
+   * @throws DeployKeyNotSetError
+   */
   get deployKey() {
-    return this.#context.deployKey || this.#settings.deployKey(this.#context);
+    return (
+      this.#context.deployKey ||
+      (this.#context.deployKeyID &&
+        this.#settings.deployKeys.find(
+          (key) => key.id === this.#context.deployKeyID,
+        ))
+    );
+  }
+
+  get deployKeys() {
+    return this.#settings.deployKeys;
   }
 
   /**
@@ -135,6 +150,10 @@ export class Config {
 
   get serverURL() {
     return this.#settings.serverURL;
+  }
+
+  get deployKeyIDFilePath() {
+    return this.#context.deployKeyIDFilePath;
   }
 
   get deployKeyDirectory() {

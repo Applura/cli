@@ -1,15 +1,11 @@
 import { readFileSync, statSync } from "node:fs";
-import {
-  InvalidConfigurationFileError,
-  InvalidPathError,
-  MissingConfigurationDirectoryError,
-} from "./errors.js";
+import { InvalidConfigurationFileError } from "./errors.js";
 import { homedir } from "node:os";
 import { programName } from "./config.js";
 import path from "node:path";
 
 const contextDirectory = ".applura";
-const contextFileName = "application.json";
+const deployKeyIDFileName = "deploy-key-id";
 
 /**
  * @param {string} cwd
@@ -18,50 +14,31 @@ const contextFileName = "application.json";
  * @return {[Context, string[]]}
  */
 export function getContext(cwd, argv, env) {
-  const contextFilePath = `${cwd}/${contextDirectory}/${contextFileName}`;
-  const contextStats = statSync(contextFilePath, { throwIfNoEntry: false });
-  const overrides = {
+  const deployKeyIDFilePath = `${cwd}/${contextDirectory}/${deployKeyIDFileName}`;
+  const init = {
     configuration: `${env["XDG_CONFIG_HOME"] || `${homedir()}/.config`}/${programName}`,
-    project: env["APPLURA_PROJECT_ID"],
-    application: env["APPLURA_APPLICATION_ID"],
     deployKey: env["APPLURA_DEPLOY_KEY"],
     execArgv: argv.slice(0, 2),
+    deployKeyIDFilePath,
   };
+  try {
+    init.deployKeyID = readFileSync(deployKeyIDFilePath).toString();
+  } catch (e) {
+    if (!new Set(["ENOTDIR", "ENOENT"]).has(e.code)) {
+      throw e;
+    }
+  }
   const configFlagIndex = argv.some((arg) => arg === "--config-dir")
     ? argv.lastIndexOf("--config-dir")
     : argv.lastIndexOf("-c");
   const hasConfigOverride = configFlagIndex > -1;
   if (hasConfigOverride) {
-    overrides.configuration = argv[configFlagIndex + 1];
+    init.configuration = argv[configFlagIndex + 1];
   }
   const unhandledArgs = hasConfigOverride
     ? argv.toSpliced(configFlagIndex, 2)
     : argv;
-  if (contextStats === undefined) {
-    return [new Context(overrides), unhandledArgs];
-  }
-  let data;
-  try {
-    data = JSON.parse(readFileSync(contextFilePath).toString());
-  } catch (e) {
-    throw new InvalidConfigurationFileError(
-      `invalid context: unable to parse JSON: ${e.message}: ${contextFilePath}`,
-    );
-  }
-  if (typeof data !== "object" || data === null) {
-    throw new InvalidConfigurationFileError(
-      `invalid context: must contain a top-level object: ${contextFilePath}`,
-    );
-  }
-  const recognizedProps = new Set(["project", "application", "deployKey"]);
-  for (const prop in data) {
-    if (!recognizedProps.has(prop)) {
-      throw new InvalidConfigurationFileError(
-        `invalid context: unrecognized prop: ${contextFilePath}: /${prop}`,
-      );
-    }
-  }
-  return [new Context({ ...data, ...overrides }), unhandledArgs];
+  return [new Context(init), unhandledArgs];
 }
 
 export class Context {
@@ -72,45 +49,33 @@ export class Context {
   /**
    * @type string
    */
-  #project;
-  /**
-   * @type string
-   */
-  #application;
-  /**
-   * @type string
-   */
   #deployKey;
   /**
    * @type string
    */
   #deployKeyID;
+  /**
+   * @type string
+   */
+  #deployKeyIDFilePath;
 
   /**
    * @param {Object} init
-   * @param {string} [init.project]
-   * @param {string} [init.application]
    * @param {string} [init.deployKey]
+   * @param {string} [init.deployKeyID]
+   * @param {string} init.deployKeyIDFilePath
    * @param {string} init.configuration
    */
   constructor(init) {
-    this.#project = init.project;
-    this.#application = init.application;
     this.#deployKey = init.deployKey;
+    this.#deployKeyID = init.deployKeyID;
     const { configuration } = init;
     let configDir = path.normalize(configuration);
     if (!path.isAbsolute(configDir)) {
       configDir = `${process.cwd()}/${configuration}`;
     }
     this.#configurationDirectory = configDir;
-  }
-
-  get project() {
-    return this.#project;
-  }
-
-  get application() {
-    return this.#application;
+    this.#deployKeyIDFilePath = init.deployKeyIDFilePath;
   }
 
   get deployKey() {
@@ -119,6 +84,10 @@ export class Context {
 
   get deployKeyID() {
     return this.#deployKeyID;
+  }
+
+  get deployKeyIDFilePath() {
+    return this.#deployKeyIDFilePath;
   }
 
   get configurationDirectory() {

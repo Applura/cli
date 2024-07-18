@@ -1,5 +1,6 @@
 import { Config } from "./lib/config.js";
 import {
+  InvalidPathError,
   KnownError,
   MissingConfigurationDirectoryError,
   MissingConfigurationFileError,
@@ -12,12 +13,14 @@ import {
   setUpMissingConfigurationFile,
 } from "./routines/setup.js";
 import deployKey from "./commands/deploy-key.js";
+import deploy from "./commands/deploy.js";
 import { getContext } from "./lib/context.js";
 
 const commands = {
   // init is a noop since the main function prepares any missing config.
   init: () => {},
   "deploy-key": deployKey,
+  deploy: deploy,
 };
 
 export default async function main(cwd, argv, stdStreams, env) {
@@ -62,13 +65,23 @@ async function handle(e, commandName, programArgs, stdStreams, context) {
   if (e instanceof NoCommandError) {
     throw e;
   }
+  const resolveWith = (fn) => () => fn(programArgs, stdStreams, context);
   const routines = new Map([
-    [MissingConfigurationDirectoryError, setUpMissingConfigurationDirectory],
-    [MissingConfigurationFileError, setUpMissingConfigurationFile],
+    [
+      MissingConfigurationDirectoryError,
+      resolveWith(setUpMissingConfigurationDirectory),
+    ],
+    [MissingConfigurationFileError, resolveWith(setUpMissingConfigurationFile)],
+    [
+      InvalidPathError,
+      (e) => {
+        throw e;
+      },
+    ],
   ]);
   for (const [errorType, resolve] of routines) {
     if (e instanceof errorType) {
-      return await resolve(programArgs, stdStreams, context);
+      return await resolve(e);
     }
   }
   throw new KnownError(`unhandled error: ${e.constructor.name}: ${e.message}`);
