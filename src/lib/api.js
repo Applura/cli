@@ -23,7 +23,15 @@ export async function apiDeploy(
   const createFormLink = releaseOverview.links.get("create-form").href;
   const createFrom = await getLinkData(key, createFormLink, { config });
   const testDir = mkdtempSync(`${tmpdir()}${sep}`);
-  await zip({source: deployFolder, destination: `${testDir}${sep}deploy.zip`});
+  await printWhile(
+      stderr,
+      {
+        pending: "Creating deploy file…",
+        resolved: "Deploy file creation complete.\n",
+        rejected: "Deploy file creation failed.\n",
+      },
+      zip({source: deployFolder, destination: `${testDir}${sep}deploy.zip`}),
+  );
   const uploadLink = createFrom.links.get(
     "https://docs.applura.com/operations/link-relations/upload-frontend-release",
   ).href;
