@@ -193,9 +193,12 @@ export class DeployKey {
    * @param {Config} options.config
    */
   static async getProject(key, { config }) {
+    if (typeof key === "object") {
+      key = key.read()
+    }
     const response = await fetch(config.serverURL, {
       headers: {
-        authorization: `Bearer ${key.read()}`,
+        authorization: `Bearer ${key}`,
       },
     });
     if (response.status !== 200) {
