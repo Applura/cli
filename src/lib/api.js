@@ -1,5 +1,5 @@
 import { DeployKey } from "./deploy-key.js";
-import { zip } from "zip-a-folder";
+import { zip } from "bestzip";
 import { mkdtempSync, statSync, createReadStream } from "node:fs";
 import { UnknownError } from "./errors.js";
 import parse from "./resource.js";
@@ -14,21 +14,16 @@ export async function apiDeploy(
   { stdin, stdout, stderr },
   config,
 ) {
+  if (typeof key === "object") {
+    key = key.read()
+  }
   const project = await DeployKey.getProject(key, { config });
   const releaseOverviewLink = project.links.get("releases").href;
   let releaseOverview = await getLinkData(key, releaseOverviewLink, { config });
   const createFormLink = releaseOverview.links.get("create-form").href;
   const createFrom = await getLinkData(key, createFormLink, { config });
   const testDir = mkdtempSync(`${tmpdir()}${sep}`);
-  await printWhile(
-    stderr,
-    {
-      pending: "Creating deploy file…",
-      resolved: "Deploy file creation complete.\n",
-      rejected: "Deploy file creation failed.\n",
-    },
-    zip(deployFolder, `${testDir}${sep}deploy.zip`),
-  );
+  await zip({source: deployFolder, destination: `${testDir}${sep}deploy.zip`});
   const uploadLink = createFrom.links.get(
     "https://docs.applura.com/operations/link-relations/upload-frontend-release",
   ).href;
@@ -67,7 +62,7 @@ export async function apiDeploy(
   };
   const releaseEditForm = await fetch(config.serverURL + releaseEditFormLink, {
     headers: {
-      authorization: `Bearer ${key.read()}`,
+      authorization: `Bearer ${key}`,
     },
     method: "PATCH",
     body: JSON.stringify(payload),
@@ -87,7 +82,7 @@ export async function apiDeploy(
 async function getLinkData(key, href, { config }) {
   const response = await fetch(config.serverURL + href, {
     headers: {
-      authorization: `Bearer ${key.read()}`,
+      authorization: `Bearer ${key}`,
     },
   });
   if (response.status !== 200) {
