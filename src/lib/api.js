@@ -31,7 +31,11 @@ export async function apiDeploy(
         resolved: `Deployment artifact created. (${filepath})\n`,
         rejected: "Deployment artifact creation failed.\n",
       },
-      zip({source: deployFolder, destination: `${testDir}${sep}deploy.zip`}),
+      zip({
+        cwd: deployFolder,
+        source: `.${sep}/*`,
+        destination: filepath,
+      }),
   );
   const uploadLink = createFrom.links.get(
     "https://docs.applura.com/operations/link-relations/upload-frontend-release",
