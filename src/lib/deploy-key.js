@@ -194,7 +194,7 @@ export class DeployKey {
    */
   static async getProject(key, { config }) {
     if (typeof key === "object") {
-      key = key.read()
+      key = key.read();
     }
     const response = await fetch(config.serverURL, {
       headers: {
