@@ -1,9 +1,8 @@
 import { Config, configFileName } from "../lib/config.js";
 import { mkdirSync } from "node:fs";
-import { read } from "read";
 import { writeFile } from "node:fs/promises";
 import { sep } from "node:path";
-import { isYes } from "../lib/cli.js";
+import { confirm } from "../lib/cli.js";
 
 export async function setUpMissingConfigurationDirectory(
   programArgs,
@@ -11,13 +10,13 @@ export async function setUpMissingConfigurationDirectory(
   context,
 ) {
   const configDir = context.configurationDirectory;
-  const answer = await read({
-    silent: false,
-    prompt: `${configDir} does not exist. Would you like to create it? [Y/n] `,
+  const isYes = await confirm({
+    question: `${configDir} does not exist. Would you like to create it?`,
+    confirmOnEnter: true,
     input: stdin,
-    output: stdout,
+    output: stderr,
   });
-  if (!isYes(answer)) {
+  if (!isYes) {
     return false;
   }
   const created = mkdirSync(configDir, {
@@ -44,13 +43,12 @@ export async function setUpMissingConfigurationFile(
 ) {
   const configDir = context.configurationDirectory;
   if (!yes) {
-    const answer = await read({
-      silent: false,
-      prompt: `${configDir}/${configFileName} does not exist. Would you like to create it? [Y/n] `,
+    yes = await confirm({
+      question: `${configDir}/${configFileName} does not exist. Would you like to create it?`,
+      confirmOnEnter: true,
       input: stdin,
-      output: stdout,
+      output: stderr,
     });
-    yes = isYes(answer);
   }
   if (!yes) {
     return false;
