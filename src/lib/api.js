@@ -15,7 +15,7 @@ export async function apiDeploy(
   config,
 ) {
   if (typeof key === "object") {
-    key = key.read()
+    key = key.read();
   }
   const project = await DeployKey.getProject(key, { config });
   const releaseOverviewLink = project.links.get("releases").href;
@@ -24,13 +24,13 @@ export async function apiDeploy(
   const createForm = await getLinkData(key, createFormLink, { config });
   const testDir = mkdtempSync(`${tmpdir()}${sep}`);
   await printWhile(
-      stderr,
-      {
-        pending: "Creating deploy file…",
-        resolved: "Deploy file creation complete.\n",
-        rejected: "Deploy file creation failed.\n",
-      },
-      zip({source: deployFolder, destination: `${testDir}${sep}deploy.zip`}),
+    stderr,
+    {
+      pending: "Creating deploy file…",
+      resolved: "Deploy file creation complete.\n",
+      rejected: "Deploy file creation failed.\n",
+    },
+    zip({ source: deployFolder, destination: `${testDir}${sep}deploy.zip` }),
   );
   const uploadLink = createForm.links.get(
     "https://docs.applura.com/operations/link-relations/upload-frontend-release",
