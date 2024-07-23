@@ -21,7 +21,7 @@ export async function apiDeploy(
   const releaseOverviewLink = project.links.get("releases").href;
   let releaseOverview = await getLinkData(key, releaseOverviewLink, { config });
   const createFormLink = releaseOverview.links.get("create-form").href;
-  const createFrom = await getLinkData(key, createFormLink, { config });
+  const createForm = await getLinkData(key, createFormLink, { config });
   const testDir = mkdtempSync(`${tmpdir()}${sep}`);
   await printWhile(
       stderr,
@@ -32,7 +32,7 @@ export async function apiDeploy(
       },
       zip({source: deployFolder, destination: `${testDir}${sep}deploy.zip`}),
   );
-  const uploadLink = createFrom.links.get(
+  const uploadLink = createForm.links.get(
     "https://docs.applura.com/operations/link-relations/upload-frontend-release",
   ).href;
   const stats = statSync(`${testDir}${sep}deploy.zip`);
