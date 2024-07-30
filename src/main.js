@@ -14,6 +14,7 @@ import {
 } from "./routines/setup.js";
 import deployKey from "./commands/deploy-key.js";
 import deploy from "./commands/deploy.js";
+import serve from "./commands/serve.js";
 import { getContext } from "./lib/context.js";
 
 const commands = {
@@ -21,6 +22,7 @@ const commands = {
   init: () => {},
   "deploy-key": deployKey,
   deploy: deploy,
+  serve: serve,
 };
 
 export default async function main(cwd, argv, stdStreams, env) {
